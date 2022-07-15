@@ -1,10 +1,10 @@
-import csv
 from collections import Counter
 
 
-def read():
-    with open('./data/6.csv') as f:
-        r = csv.reader(f).__next__()
+def read(loc: str):
+    with open(loc) as f:
+        r = f.readline().split(',')
+        r = list(map(int, r))
         count = Counter(r)
         data = [0 for _ in range(9)]
         for k, v in count.items():
@@ -12,23 +12,19 @@ def read():
         return data
 
 
-def first(n: int):
-    initial = read()
-    for k in range(n):
-        print(initial)
-        current = initial[1:7] + [initial[0] + initial[7]] + [initial[8]] + [initial[0]]
-        initial = current
+def first(loc: str, n: int):
+    initial = read(loc)
+    for _ in range(n):
+        initial = initial[1:7] + [initial[0] + initial[7]] + [initial[8]] + [initial[0]]
     print(sum(initial))
+    return(sum(initial))
 
 
-def first2(initial: list[int, ...], n: int):
-    for k in range(n):
-        print(initial)
-        current = initial[1:7] + [initial[0] + initial[7]] + [initial[8]] + [initial[0]]
-        initial = current
-        print(sum(initial))
+def second(loc: str, n: int):
+    return first(loc, n)
 
 
-a = [0, 1, 1, 2, 1, 0, 0, 0, 0]
-b = [1, 0, 0, 0, 0, 0, 0, 0, 0]
-first2(b, 100)
+first('./data/6.csv', 80)
+
+second('./data/6.csv', 256)
+
