@@ -1,174 +1,143 @@
-import csv
-import random
-"""Not solved. You dumbass"""
-
-def readIn():
-    with open('./data/8a.csv') as f:
-        r = list(csv.reader(f, delimiter=' '))
-    # data = []
-    # for x in r:
-    #     ctr = {
-    #         2: [],
-    #         3: [],
-    #         4: [],
-    #         5: [],
-    #         6: [],
-    #         7: []
-    #     }
-    #     for y in x:
-    #         ctr[len(y)].append(y)
-    #     data.append(ctr)
-    return r
+def read(loc: str) -> tuple[list, list]:
+    """Important: Sort all strings lexicographically. In the input strings, sort the tuples according to the lengths of their elements. In the output data, don't do this, wrong."""
+    data_in: list[tuple[str]] = []
+    data_out: list[tuple[str]] = []
+    with open(loc) as f:
+        r = f.readlines()
+        for row in r:
+            row = row.split()
+            assert row[10] == "|"
+            a = tuple(sorted(["".join(sorted(x)) for x in row[:10]], key=len))
+            b = tuple(["".join(sorted(x)) for x in row[11:]])
+            assert len(a) == 10
+            assert len(b) == 4
+            data_in.append(a)
+            data_out.append(b)
+    return (data_in, data_out)
 
 
-def readOut():
-    with open('./data/8b.csv') as f:
-        r = csv.reader(f, delimiter=' ')
-        dataOut = list(r)
-    return dataOut
+def crack(a: tuple[str]) -> tuple[dict[str, str], dict[str, str]]:
+    dec: dict[str, str] = dict()
+    enc: dict[str, str] = dict()
+    aa = tuple(map(set, a))
+    assert len(aa[0]) == 2
+    assert len(aa[1]) == 3
+    assert len(aa[2]) == 4
+    assert len(aa[3]) == len(aa[4]) == len(aa[5]) == 5
+    assert len(aa[6]) == len(aa[7]) == len(aa[8]) == 6
+    assert len(aa[9]) == 7
+
+    # a
+    inter: set[str] = aa[1].symmetric_difference(aa[0])
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'a'
+    enc['a'] = val
+
+    # d 
+    inter: set[str] = aa[2] & aa[3] & aa[4] & aa[5] 
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'd'
+    enc['d'] = val
+
+    # f 
+    inter: set[str] = aa[0] & aa[6] & aa[7] & aa[8] 
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'f'
+    enc['f'] = val
+
+    # c 
+    inter: set[str] = aa[0].symmetric_difference({ val })
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'c'
+    enc['c'] = val
+
+    # g 
+    inter: set[str] = aa[3] & aa[4] & aa[5] 
+    inter = inter.difference(aa[2], aa[1])
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'g'
+    enc['g'] = val
+
+    # b 
+    inter: set[str] = aa[2].difference({ enc['d'], enc['c'], enc['f'] })
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'b'
+    enc['b'] = val
+
+    # e 
+    inter: set[str] = aa[-1].difference({ x for x in dec })
+    assert len(inter) == 1
+    val = inter.pop()
+    dec[val] = 'e'
+    enc['e'] = val
+
+    assert len(dec) == len(enc) == 7
+    return enc, dec
 
 
-def strCont(smol: str, yuge: str):
-    for x in smol:
-        if x in yuge:
-            continue
-        else:
-            return False
-    return True
+def decode(cypher: dict[str, str], vals: tuple[str, str, str, str]) -> int:
+    val = 0
+    for exp, num in enumerate(vals):
+        base = -1
+        match len(num):
+            case 2:
+                base = 1
+            case 3:
+                base = 7
+            case 4:
+                base = 4
+            case 7:
+                base = 8
+            case 5:
+                if cypher['c'] not in num:
+                    base = 5
+                elif cypher['f'] in num:
+                    base = 3
+                else:
+                    assert cypher ['e'] in num
+                    base = 2
+            case 6:
+                if cypher['d'] not in num:
+                    base = 0
+                elif cypher['e'] not in num:
+                    base = 9
+                else:
+                    assert cypher['c'] not in num
+                    base = 6
+        assert base != -1
+        val += base*10**(3-exp)
+    return val
 
 
-def whichNumber(row: list[[str, ...]]):
-    """Takes a row, and matches each input to its corresponding number."""
-    numbers = ["" for _ in range(10)]
-    row.sort(key=len)
-    numbers[1] = row[0]  # Shortest 7-segment-code is 1
-    numbers[7] = row[1]  # second shortest 7-segment-code is 7 etc
-    numbers[4] = row[2]
-    numbers[8] = row[9]
-    # These are the only ones with a unique length
-    # It gets weird from here
-    # jesus. find the 6 by checking which number doesn't contain the 1
-    numbers[6] = next(filter(lambda x: not strCont(numbers[1], x), row[6:9]))
-    # 9 only num of length 6 which contains the 4
-    numbers[9] = next(filter(lambda x: strCont(numbers[4], x), row[6:9]))
-    numbers[0] = [x for x in row[6:9] if x not in [numbers[6], numbers[9]]][0]
-    numbers[3] = next(filter(lambda x: strCont(numbers[7], x), row[3:6]))
-    temp = [x for x in row[3:6] if x != numbers[3]]
-    if len(set(numbers[4]).intersection(temp[0])) == 1:
-        numbers[5] = temp[0]
-        numbers[2] = temp[1]
-    else:
-        numbers[5] = temp[1]
-        numbers[2] = temp[0]
-    assert len(temp) == 2 # Sanity check
-    assert len(numbers) == len(set(numbers)) # Unique matches, sanity check
-    return numbers
+def first(loc: str) -> int:
+    _, out = read(loc)
+    appearances = 0
+    for row in out:
+        for val in row:
+            if len(val) in {2, 3, 4, 7}:
+                appearances += 1
+
+    print(appearances)
+    return(appearances)
 
 
-def whichNumber2(row: list[[str, ...]]):
-    """Braden's attempt at refactoring whichNumber()"""
-    nocontain1 = lambda x: not strCont(numbers[1], x)
-    fn_containsrow = lambda idx: lambda row: strCont(numbers[idx], row)
-    fn_getrow = lambda x: lambda _: row[x]
-    fn_nextfilter = lambda fn, rngs, rnge: lambda _: next(filter(fn, row[rngs:rnge]))
-    whateverthehellishappeningfor0 = lambda _: [x for x in row[6:9] if x not in [numbers[6], numbers[9]]][0]
-    fn_wthihf52 = lambda t, f: lambda _: temp[t if (len(set(numbers[4]).intersection(temp[0])) == 1) else f]
-    nextfilter3 = fn_nextfilter(fn_containsrow(7), 3, 6)
-    numbers = ["" for _ in range(10)]
+def second(loc: str) -> int:
+    a, b = read(loc)
 
-    getters = [
-        whateverthehellishappeningfor0,
-        fn_getrow(0),
-        fn_wthihf52(1, 0),
-        nextfilter3,
-        fn_getrow(2),
-        fn_wthihf52(0, 1),
-        fn_nextfilter(nocontain1, 6, 9),
-        fn_getrow(1),
-        fn_getrow(9),
-        fn_nextfilter(fn_containsrow(4), 6, 9)
-    ]
+    val = 0
+    for aa, bb in zip(a, b):
+        enc, _ = crack(aa)
+        val += decode(enc, bb)
 
-    row.sort(key=len)
-    temp = [x for x in row[3:6] if x != nextfilter3(None)]
-    assert len(temp) == 2 # Sanity check
+    print(val)
+    return val
 
-    for i in range(len(getters)):
-        numbers[i] = getters[i](None)
+first("./data/8.csv")
+second("./data/8.csv")
 
-    assert len(numbers) == len(set(numbers)) # Unique matches, sanity check
-    return numbers
-
-def primSolver(row: list[str, ...]):
-    candidates = {k: {'a', 'b', 'c', 'd', 'e', 'f', 'g'} for k in {'a', 'b', 'c', 'd', 'e', 'f', 'g'}}
-    numReal = {
-        0: {'a', 'b', 'c', 'e', 'f', 'g'},
-        1: {'c', 'f'},
-        2: {'a', 'c', 'd', 'e', 'g'},
-        3: {'a', 'c', 'd', 'f', 'g'},
-        4: {'b', 'c', 'd', 'f'},
-        5: {'a', 'b', 'd', 'f', 'g'},
-        6: {'a', 'b', 'd', 'e', 'f', 'g'},
-        7: {'a', 'c', 'f'},
-        8: {'a', 'b', 'c', 'd', 'e', 'f', 'g'},
-        9: {'a', 'b', 'c', 'd', 'f', 'g'}
-    }
-    while any(len(x) > 1 for x in candidates.values()):
-        x = y = z = {'a', 'b', 'c', 'd', 'e', 'f', 'g'}
-        orderNums = random.shuffle(list(range(10)))
-        while min(len(x), len(y), len(z)) > 0:
-            pass
-
-
-def retInter(nums: list):
-    candidates = {'a', 'b', 'c', 'd', 'e', 'f', 'g'}
-    for x in nums:
-        candidates = candidates.intersection(x)
-    return candidates
-
-
-def stupidSolver(nums: list[set, ...]):
-    sol = dict()
-
-
-    a = nums[7].difference(nums[1])
-    b = nums[4].difference(nums[3])
-    c = nums[1].difference(nums[6])
-    d = nums[8].difference(nums[0])
-    e = nums[2].difference(nums[3])
-    f = nums[1].difference(nums[2])
-    g = nums[5].difference(nums[4], nums[7])
-    print(f"{g=}")
-    sol[a.pop()] = 'a'
-    sol[b.pop()] = 'b'
-    sol[c.pop()] = 'c'
-    sol[d.pop()] = 'd'
-    sol[e.pop()] = 'e'
-    sol[f.pop()] = 'f'
-    sol[g.pop()] = 'g'
-    return sol
-
-
-def first(nums: list[[str, str, str, str], ...]):
-    count = 0
-    for panel in nums:
-        for num in panel:
-            if len(num) in {2, 3, 4, 7}:
-                count += 1
-    return count
-
-
-def second(nums: list[[str, ...]]):
-    count = 0
-    for x in nums:
-        numbers = whichNumber(x)
-        print(numbers)
-        a = [{z for z in y} for y in numbers]
-        print(a)
-        sol = stupidSolver(a)
-        print(sol)
-
-
-
-print(first(readOut()))
-print(second(readIn()))
