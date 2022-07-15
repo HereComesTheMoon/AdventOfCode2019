@@ -4,29 +4,29 @@ from math import inf
 from typing import Callable
 
 
-def read():
+def read(loc: str) -> list[int]:
     """Returns list of ints, positions of crab subs."""
-    with open('./data/7.csv') as f:
-        data = list(map(int, csv.reader(f).__next__()))
+    with open(loc) as f:
+        data = list(map(int, f.readline().split(",")))
+        # data = list(map(int, csv.reader(f).__next__()))
     return data
 
 
-def weightOfCurrentPosSecond(initPos: list[int, ...], targetPos: int):
+def weightOfCurrentPosSecond(initPos: list[int], targetPos: int) -> int:
     """Returns fuel required for all subs to move to position targetPos. This is part two, with different fuel calculations."""
     temp = map(lambda x: abs(x - targetPos), initPos) # Generator of the distances to the target spot
     return sum([x*(x+1)//2 for x in temp]) # Put the individual fuel requirements in a list (binomial formula), then take sum
 
 
-def weightOfCurrentPos(initPos: list[int, ...], targetPos: int):
+def weightOfCurrentPos(initPos: list[int], targetPos: int) -> int:
     """Returns fuel required for all subs to move to position targetPos."""
     return sum(map(lambda x: abs(x - targetPos), initPos))
 
 
-def GoldenSectionSearch():
-    pass
-
-
-def isUnimodal(func: Callable[[int], int], lower: int, upper: int):
+# Just for fun. Check unimodality. Knowing that a function is unimodal can in principle be used to vastly reduce the computations in
+# problems like these, where finding a minimum is required.
+# These two functions are not used
+def _isUnimodal(func: Callable[[int], int], lower: int, upper: int):
     """Takes a function taking an int, and returning an int, and checks if it is unimodal for integer values a <= k <= b.
     Only enter function that always returns the same values for same inputs, of course. Ideally: Use @functools.cache"""
     while lower < upper and func(lower) == func(lower + 1):
@@ -48,7 +48,7 @@ def isUnimodal(func: Callable[[int], int], lower: int, upper: int):
     return False
 
 
-def isUnimodalList(nums: [int, ...]):
+def _isUnimodalList(nums: list[int]):
     """Checks if list is unimodal."""
     finDiff = [nums[k + 1] - nums[k] for k in range(len(nums) - 1)]
     print(finDiff)
@@ -71,23 +71,23 @@ def isUnimodalList(nums: [int, ...]):
     return False
 
 
-def first(data: list[int, ...]):
-    smallest = inf
+def first(loc: str) -> int:
+    data = read(loc)
+    smallest = weightOfCurrentPos(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):
         smallest = min(smallest, weightOfCurrentPos(data, k))
+    print(smallest)
     return smallest
 
 
-def second(data: list[int, ...]):
-    smallest = inf
+def second(loc: str) -> int:
+    data = read(loc)
+    smallest = weightOfCurrentPosSecond(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):
         smallest = min(smallest, weightOfCurrentPosSecond(data, k))
+    print(smallest)
     return smallest
 
+first('./data/7.csv')
+second('./data/7.csv')
 
-print(second(read()))
-print(second([16, 1, 2, 0, 4, 2, 7, 1, 2, 14]))
-
-# Chech unimodality
-arr = read()
-print(isUnimodalList([weightOfCurrentPosSecond(arr, x) for x in range(min(arr), max(arr)+1)]))
