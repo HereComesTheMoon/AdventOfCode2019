@@ -48,18 +48,16 @@ def first():
 
 def second():
     draws, boards = readBingo()
-    won = []
-    for k in range(len(draws)):
-        for j, x in enumerate(boards):
-            if results := boardWon(x, draws[:k]):
-                if j in won:
-                    continue
-                won.append(j)
-                printBoard(x, "Losing board:")
-                printBoard(results)
-                a = sum([y for y, b in zip(x, results) if not b]) * draws[k - 1]
-                print(a)
-
-
-second()
+    wins_at = 0
+    wins_val = 0
+    for board in boards:
+        for k in range(len(draws)):
+            if results := boardWon(board, draws[:k]):
+                if k > wins_at:
+                    printBoard(results)
+                    wins_at = k
+                    wins_val = sum([y for y, b in zip(board, results) if not b]) * draws[k - 1]
+                break
+    print(f"Worst board wins after {wins_at} turns, with final score {wins_val}.")
+    return wins_val
 
