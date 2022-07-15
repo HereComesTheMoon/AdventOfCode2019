@@ -1,60 +1,80 @@
-import csv
-import numpy as np
+class Octopuses: 
+    def __init__(self, loc: str):
+        with open(loc) as f:
+            r = f.readlines()
+            grid = [ [int(x) for x in row[:-1]] for row in r ]
 
-def read():
-    return np.loadtxt(f'./data/11.csv', int, delimiter=',')
-
-
-def getNghbrs(n: int, m: int, i: int, j: int):
-    """n, m dimensions of grid, i, j position"""
-    cnds = [
-        (i - 1, j),
-        (i + 1, j),
-        (i, j - 1),
-        (i, j + 1),
-        (i - 1, j - 1),
-        (i - 1, j + 1),
-        (i + 1, j - 1),
-        (i + 1, j + 1),
-
-    ]
-    return [(x, y) for (x, y) in cnds if inGrid(n, m, x, y)]
+        self.grid = grid
+        self.len_x = len(grid)
+        self.len_y = len(grid[0])
+        self.flashes = 0
+        self.number_steps = 0
 
 
-def inGrid(n: int, m: int, i: int, j: int):
-    return 0 <= i < n and 0 <= j < m
+    def step(self):
+        self.number_steps += 1
+        for x in range(self.len_x):
+            for y in range(self.len_y):
+                self.grid[x][y] += 1
 
-
-def turn():
-    pass
-
-
-def second(data: np.ndarray, runtime: int = 100):
-    n, m = data.shape
-    total_flashes = 0
-    for k in range(runtime):
-        data = np.add(data, np.ones((n,m), dtype=int))
-        print(data)
-        flashedCords = []
         flashed = True
+        flashed_positions: set[tuple[int, int]] = set()
         while flashed:
             flashed = False
-            for i in range(n):
-                for j in range(m):
-                    if data[i, j] > 9:
-                        assert (i, j) not in flashedCords
-                        total_flashes += 1
-                        flashed = True
-                        data[i, j] = 0
-                        flashedCords.append((i, j))
-                        for x, y in getNghbrs(n, m, i, j):
-                            data[x, y] += 1
-        for x, y in flashedCords:
-            data[x, y] = 0
-        if len(flashedCords) == data.size:
-            return k
+            for x in range(self.len_x):
+                for y in range(self.len_y):
+                    if self.grid[x][y] <= 9:
+                        continue
+                    assert (x, y) not in flashed_positions # Unnecessary, this is impossible.
+                    flashed_positions.add((x, y))
+                    flashed = True
+                    self.flashes += 1
+                    self.grid[x][y] = 0
+                    for a, b in self._neighbours(x, y):
+                        self.grid[a][b] += 1
+
+        for x, y in flashed_positions:
+            self.grid[x][y] = 0
 
 
-print(second(read(), 1000))
+    def _neighbours(self, x: int, y: int) -> list[tuple[int, int]]:
+        adj = [
+                (x-1, y-1),
+                (x-1, y  ),
+                (x-1, y+1),
+                (x  , y-1),
+                (x  , y+1),
+                (x+1, y-1),
+                (x+1, y  ),
+                (x+1, y+1),
+                ]
+        adj = filter(lambda l: 0 <= l[0] < self.len_x and 0 <= l[1] < self.len_y, adj)
+        return list(adj)
 
+
+def first(loc: str = "./data/11.csv") -> int:
+    octopi = Octopuses(loc)
+    for _ in range(100):
+        octopi.step()
+
+    print(octopi.flashes)
+    return octopi.flashes
+
+
+def second(loc: str = "./data/11.csv") -> int:
+    octopi = Octopuses(loc)
+    previous_flashes = octopi.flashes
+    grid_size = octopi.len_x * octopi.len_y
+
+    # Maximal number of flashes = grid_size. Check until the number of flashes incremented that much in a single turn
+    while octopi.flashes != previous_flashes + grid_size:
+        previous_flashes = octopi.flashes
+        octopi.step()
+
+    print(octopi.number_steps)
+    return octopi.number_steps
+
+
+first()
+second()
 
