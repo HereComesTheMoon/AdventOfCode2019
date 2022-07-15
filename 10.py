@@ -1,14 +1,12 @@
-import csv
+def read(loc: str) -> list[str]:
+    with open(loc) as f:
+        r = f.readlines()
+        # data = [[x for x in row[:-1]] for row in r]
+        data = [row[:-1] for row in r]
+        return data
 
 
-# 8:25
-
-def read():
-    with open('./data/10.csv') as f:
-        return list(csv.reader(f))
-
-
-def syntax_score(errors: list):
+def syntax_score(errors: list) -> int:
     matches = {
         ')': 3,
         ']': 57,
@@ -18,7 +16,7 @@ def syntax_score(errors: list):
     return sum( matches[x] for x in errors )
 
 
-def completion_score(nums: list):
+def completion_score(nums: list) -> int:
     matches = {
         '(': 1,
         '[': 2,
@@ -30,14 +28,14 @@ def completion_score(nums: list):
     return 5*completion_score(nums[1:]) + matches[nums[0]]
 
 
-def first():
+def first(loc: str = './data/10.csv') -> int:
     matches = {
         '(': ')',
         '[': ']',
         '{': '}',
         '<': '>'
     }
-    data = read()
+    data = read(loc)
     errors = []
     for row in data:
         stack = []
@@ -50,17 +48,19 @@ def first():
                 else:
                     errors.append(x)
                     break
-    return syntax_score(errors)
+    res = syntax_score(errors)
+    print(res)
+    return res
 
 
-def second():
+def second(loc: str = './data/10.csv') -> int:
     matches = {
         '(': ')',
         '[': ']',
         '{': '}',
         '<': '>'
     }
-    data = read()
+    data = read(loc)
     scores = []
     for row in data:
         stack = []
@@ -75,10 +75,11 @@ def second():
         scores.append(completion_score(stack))
     scores = [x for x in scores if x != 0]
     scores.sort()
-    return scores[(len(scores)-1)//2]
+    res = scores[(len(scores)-1)//2]
+    print(res)
+    return res
 
 
-print(second())
-
-
+first()
+second()
 
