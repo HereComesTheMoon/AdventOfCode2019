@@ -2,7 +2,7 @@ import csv
 
 
 class Node:
-    def __init__(self, name: str, nbrs: set['Node', ...], end: bool = False):
+    def __init__(self, name: str, nbrs: set['Node'], end: bool = False):
         self.name = name
         self.big = name.isupper()
         self.nbrs = nbrs
@@ -21,7 +21,7 @@ class Node:
     def __str__(self):
         return self.name
 
-    def find_paths(self, prev: list['Node', ...], goal: 'Node', paths: list[list['Node', ...]]):
+    def find_paths(self, prev: list['Node'], goal: 'Node', paths: list[list['Node']]):
         if self == goal:
             paths.append(prev + [self])
             return paths
@@ -32,7 +32,7 @@ class Node:
 
         return paths
 
-    def find_paths2(self, prev: list['Node', ...], goal: 'Node', paths: list[list['Node', ...]], double: bool):
+    def find_paths2(self, prev: list['Node'], goal: 'Node', paths: list[list['Node']], double: bool):
         if self == goal:
             paths.append(prev + [self])
             return paths
@@ -51,7 +51,7 @@ class Node:
 
 
 class Graph:
-    def __init__(self, nodes: set[Node, ...]):
+    def __init__(self, nodes: set[Node]):
         self.nodes = nodes
 
     def __getitem__(self, item):
@@ -79,8 +79,8 @@ class Graph:
         # return str([(x.name, (x)) for x in self.nodes])
 
 
-def read(file: str = '12'):
-    with open(f"./data/{file}.csv") as f:
+def build_graph(loc: str):
+    with open(loc) as f:
         r = csv.reader(f, delimiter='-')
         node_names = set()
         for a, b in r:
@@ -90,7 +90,7 @@ def read(file: str = '12'):
         Node(a, set(), a == 'end') for a in node_names
     }
     G = Graph(nodes)
-    with open(f'./data/{file}.csv') as f:
+    with open(loc) as f:
         r = csv.reader(f, delimiter='-')
         for a, b in r:
             G.add_edge(a, b)
@@ -98,18 +98,24 @@ def read(file: str = '12'):
     return G
 
 
-def first(G: Graph):
+def first(loc: str = "./data/12.csv"):
+    G = build_graph(loc)
     start = G.get_node_by_name("start")
     end = G.get_node_by_name("end")
     paths = start.find_paths([], end, [])
-    print(paths)
+    # print(paths)
     print(len(paths))
+    return(len(paths))
 
 
-def second(G: Graph):
+def second(loc: str = "./data/12.csv"):
+    G = build_graph(loc)
     start = G.get_node_by_name("start")
     end = G.get_node_by_name("end")
     paths = start.find_paths2([], end, [], False)
-    print(paths)
+    # print(paths)
     print(len(paths))
-print(second(read('12')))
+    return(len(paths))
+
+first()
+second()
