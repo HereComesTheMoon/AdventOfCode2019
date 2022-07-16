@@ -1,18 +1,15 @@
-import csv
 import math
 import heapq
-from pprint import pp
-
 
 
 class Node:
     def __init__(self, x: int, y: int, risk: int):
-        self.x = x
-        self.y = y
-        self.dist = math.inf
-        self.risk = risk
-        self.seen = False
-        self.nbrs = []
+        self.x: int = x
+        self.y: int = y
+        self.dist: int = math.inf
+        self.risk: int = risk
+        self.seen: bool = False
+        self.nbrs: list[Node] = []
 
     def __len__(self):
         return self.dist
@@ -24,68 +21,43 @@ class Node:
         return f"({self.x},{self.y}): {self.risk} , {self.dist}"
 
 
-def read(file: str):
-    with open(file) as f:
-        r = csv.reader(f)
-        # return [[risk for risk in row] for row in r]
+def read(loc: str, times_5: bool = False) -> list[list[Node]]:
+    def wrap_nines(x: int):
+        if 1 <= x <= 9:
+            return x
+        else:
+            return x-9
 
-        # heap = []
-        # for i, row in enumerate(r):
-        #     for j, risk in enumerate(row):
-        #         heap.append(Node(i, j, risk))
-        # return heap
-
-        # d = {}
-        # for i, row in enumerate(r):
-        #     for j, risk in enumerate(row):
-        #         d[(i, j)] = Node(i, j, risk)
-        # return d
-
-        grid = [[Node(i, j, int(risk)) for j, risk in enumerate(row)] for i, row in enumerate(r)]
-        for i, row in enumerate(grid):
-            for j, node in enumerate(row):
-                node.nbrs += [grid[x][y] for x, y in getNghbrs(grid, i, j)]
-        return grid
-
-
-def wrap_nines(x: int):
-    if 1 <= x <= 9:
-        return x
-    else:
-        return x-9
-
-
-
-def write(test: bool = False):
-    file = "./data/15"
-    if test:
-        file += "test"
-    file += ".csv"
-
-    with open(file) as fi:
-        r = csv.reader(fi)
-        new_rows = []
+    with open(loc) as f:
+        r = f.readlines()
+        rows = []
         for row in r:
-            new_row = []
+            row = row.strip()
+            row = list(map(int, row))
+
+            if times_5:
+                new_row = []
+                for k in range(5):
+                    new_row.extend([wrap_nines(x + k) for x in row])
+                row = new_row
+
+            rows.append(row)
+
+        if times_5:
+            new_rows: list[list[int]] = []
             for k in range(5):
-                new_row += [wrap_nines(int(x) + k) for x in row]
-            new_rows.append(new_row)
+                for row in rows:
+                    new_rows.append([wrap_nines(x + k) for x in row])
+            rows = new_rows
 
-        new_grid = []
-        for k in range(5):
-            for row in new_rows:
-                new_grid.append([wrap_nines(x + k) for x in row])
-
-    with open("./data/15b.csv", 'w') as fo:
-        w = csv.writer(fo)
-        w.writerows(new_grid)
+    grid = [[Node(i, j, risk) for j, risk in enumerate(row)] for i, row in enumerate(rows)]
+    for i, row in enumerate(grid):
+        for j, node in enumerate(row):
+            node.nbrs += [grid[x][y] for x, y in getNghbrs(grid, i, j)]
+    return grid
 
 
-
-
-
-def getNghbrs(grid: list[list[...]], i: int, j: int):
-    """n, m dimensions of grid, i, j position"""
+def getNghbrs(grid: list[list], i: int, j: int) -> list[tuple[int,int]]:
     n = len(grid)
     m = len(grid[0])
     cnds = [
@@ -94,68 +66,43 @@ def getNghbrs(grid: list[list[...]], i: int, j: int):
         (i, j - 1),
         (i, j + 1)
     ]
-    return ((x, y) for (x, y) in cnds if 0 <= x < n and 0 <= y < m)
+    return list(filter(lambda l: 0 <= l[0] < n and 0 <= l[1] < m, cnds))
 
 
-def first(grid: list[list[Node, ...]]):
+def solve(grid: list[list[Node]]) -> int:
     start = grid[0][0]
     start.dist = 0
     heap = [start]
     while heap:
-        # heapq.heapify(heap)
+        # heapq.heapify(heap) # Unnecessary
         visiting = heapq.heappop(heap)
         if visiting.x == len(grid)-1 and visiting.y == len(grid[0])-1:
-            print(f"Hue: {visiting.dist=}")
-            break
+            return visiting.dist
         if visiting.seen:
             continue
         visiting.seen = True
-        # Alternative: Just do an if instead of a filter! Is this filter truly better/worth it? Benchmark?
-        for candidate in filter(lambda l: not l.seen, visiting.nbrs):
-            print(candidate.dist, visiting.dist, candidate.risk)
-            if candidate.dist == math.inf:
-                candidate.dist = visiting.dist + candidate.risk
-                heapq.heappush(heap, candidate)
-            else:
-                candidate.dist = min(candidate.dist, visiting.dist + candidate.risk)
-
-
-
-
-def second(grid: list[list[Node, ...]], heapify: bool):
-    start = grid[0][0]
-    start.dist = 0
-    heap = [start]
-    results = [[None for _ in range(len(grid[0]))] for _ in range(len(grid))]
-    count_updates = 0
-    while heap:
-        if heapify:
-            heapq.heapify(heap)
-        visiting = heapq.heappop(heap)
-        if visiting.seen:
-            continue
-        visiting.seen = True
-        results[visiting.x][visiting.y] = visiting.dist
-        # Alternative: Just do an if instead of a filter! Is this filter truly better/worth it? Benchmark?
         for candidate in filter(lambda l: not l.seen, visiting.nbrs):
             if candidate.dist == math.inf:
                 candidate.dist = visiting.dist + candidate.risk
                 heapq.heappush(heap, candidate)
             else:
-                if candidate.dist > visiting.dist + candidate.risk:
-                    count_updates += 1
                 candidate.dist = min(candidate.dist, visiting.dist + candidate.risk)
-    return results, count_updates
+    return -1 # Unreachable.
 
 
-data_names = ["", "test", "b", "testb"]
-files = ["./data/15" + x + ".csv" for x in data_names]
-n = 3
-print(len(read(files[n]))**2)
-resulta = second(read(files[n]), False)
-resultb = second(read(files[n]), True)
-pp(resulta[1])
-pp(resultb[1])
-assert resulta == resultb
-# 249001
-# write()
+def first(loc: str = "./data/15.csv"):
+    grid = read(loc)
+    res = solve(grid)
+    print(res)
+    return res
+
+
+def second(loc: str = "./data/15.csv"):
+    grid = read(loc, True)
+    res = solve(grid)
+    print(res)
+    return res
+
+first()
+second()
+
