@@ -1,19 +1,17 @@
-import csv
 from collections import Counter
 
 
-def read(test: bool = False):
-    if test:
-        with open('./data/14test.csv') as f:
-            r = csv.reader(f, delimiter=' ')
-            return "NNCB", {k: v for k, v in r}
-    start = "CKFFSCFSCBCKBPBCSPKP"
-    with open('./data/14.csv') as f:
-        r = csv.reader(f, delimiter=' ')
-        return start, {k: v for k, v in r}
+def read(loc: str):
+    with open(loc) as f:
+        r = f.readlines()
+        start = r[0].strip()
+        rows = r[2:]
+        rows = { row[:2]: row[5:].strip() for row in rows }
+    return start, rows
 
 
 def step(start: str, d: dict[str, str]) -> str:
+    """Basically, update the start string to the next string."""
     result = []
     for k in range(1, len(start)):
         a = start[k - 1:k + 1]
@@ -23,7 +21,8 @@ def step(start: str, d: dict[str, str]) -> str:
     return "".join(result)
 
 
-def step2(start: dict[str, int], d: dict[str, str]) -> dict[str, int]:
+def step2(start: dict[str, int], d: dict[str, tuple[str, str]]) -> dict[str, int]:
+    """Basically, update the start dict to the next dict."""
     result = {k: 0 for k in start}
     for k, v in start.items():
         a, b = d[k]
@@ -40,25 +39,29 @@ def tuples_to_elements(d: dict[str, int], start: str):
         elements[k[1]] += v
     elements[start[0]] += 1
     elements[start[-1]] += 1
-    print(elements)
+    # print(elements)
     for k, v in elements.items():
-        elements[k] = v //2 # elements[k] always even!
+        elements[k] = v // 2 # elements[k] always even!
     elements = list(elements.items())
     elements.sort(reverse=True, key=lambda x: x[1])
     return elements
 
 
-def first(start: str, d: dict[str, str], n: int) -> int:
+def first(loc: str = "./data/14.csv", n: int = 10) -> int:
+    start, d = read(loc)
     for k in range(n):
         print(f"{k} — length: {len(start)}:", start)
         start = step(start, d)
     print(f"{n} — length: {len(start)}:", start)
     cnt = Counter(start)
     print(cnt)
-    return cnt.most_common()[0][1] - cnt.most_common()[-1][1]
+    res = cnt.most_common()[0][1] - cnt.most_common()[-1][1]
+    print(res)
+    return res
 
 
-def second(start: str, d: dict[str, str], n: int) -> int:
+def second(loc: str = "./data/14.csv", n: int = 40) -> int:
+    start, d = read(loc)
     # Format input
     dd = {
         k: (k[0] + v, v + k[1]) for k, v in d.items()
@@ -83,11 +86,11 @@ def second(start: str, d: dict[str, str], n: int) -> int:
     # Turn tuples back into elements
     elements = tuples_to_elements(counts, start)
     print(elements)
-    return elements[0][1] - elements[-1][1]
+    res = elements[0][1] - elements[-1][1]
+    print(res)
+    return res
 
 
-# start, d = read()
-init, rules = read()
+first()
+second()
 
-# print(first(start, d, 10))
-print(second(init, rules, 40))
