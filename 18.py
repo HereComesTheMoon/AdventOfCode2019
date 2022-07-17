@@ -1,14 +1,13 @@
-import csv
 import typing
-
 
 # I made one rather severe mistake here:
 # I had to implement a binary tree, but instead of having my 'leaves' be objects of type SnailfishNumber without
 # children, I instead had them be integers. This is bad since I had to do a lot of 'isinstance(self.l, int)'
 # if statements to handle different cases. If I'd made them SnailfishNumbers, then this would've been easier
+# This code is kind of am ess in general
 
-def read():
-    with open('./data/18.csv') as f:
+def read(loc: str = './data/18.csv'):
+    with open(loc) as f:
         return [x[:-1] for x in f.readlines()]
 
 
@@ -18,10 +17,8 @@ class SnailfishNumber:
         self.r: typing.Union[int, SnailfishNumber] = 0
         self.p: typing.Union[None, SnailfishNumber] = None
 
-    def build_from_string(self, input: str):
-        # print(input)
-        if len(input) < 5:
-            print("here")
+
+    def _find_subnumbers(self, input: str) -> tuple[str, str]:
         assert len(input) >= 5
         assert self.l == 0 and self.r == 0
         assert input[0] == '['
@@ -29,6 +26,9 @@ class SnailfishNumber:
 
         count_opening_braces = 0
         input = input[1:-1]
+
+        left, right = None, None
+
         for k, x in enumerate(input):
             if x == '[':
                 count_opening_braces += 1
@@ -40,6 +40,14 @@ class SnailfishNumber:
                     left = input[:k]
                     right = input[k + 1:]
                     break
+
+        assert left is not None
+        assert right is not None
+        return left, right
+
+    def build_from_string(self, input: str):
+        left, right = self._find_subnumbers(input)
+
         # assert len(input) >= 5 at the beginning means that len(left)+left(right) >= 2
         if len(left) <= 2:
             self.l = int(left)
@@ -54,7 +62,8 @@ class SnailfishNumber:
             self.r.p = self
             self.r.build_from_string(right)
 
-    def __add__(self, other):
+
+    def __add__(self, other: "SnailfishNumber") -> "SnailfishNumber":
         a = SnailfishNumber()
         a.l = self
         a.r = other
@@ -63,10 +72,10 @@ class SnailfishNumber:
         a.reduce()
         return a
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"[{self.l},{self.r}]"
 
-    def find_nested(self, depth: int = 0):
+    def find_nested(self, depth: int = 0) -> bool:
         assert depth <= 4
         if depth == 4:
             assert isinstance(self.l, int)
@@ -130,7 +139,6 @@ class SnailfishNumber:
             return False
 
     def split(self):
-        print(self)
         if isinstance(self.l, int):
             if self.l > 9:
                 num = self.l
@@ -166,18 +174,18 @@ class SnailfishNumber:
         return 3 * int(self.l) + 2 * int(self.r)
 
 
-def first(nums: list[str, ...]):
+def first(nums: list[str]):
     result = SnailfishNumber()
     result.build_from_string(nums[0])
     for x in nums[1:]:
         next_num = SnailfishNumber()
         next_num.build_from_string(x)
         result = result + next_num
-    print(result)
     print(int(result))
+    return int(result)
 
 
-def second(nums: list[str, ...]):
+def second(nums: list[str]):
     import itertools
     maxi = 0
     for x,y in itertools.permutations(nums, 2):
@@ -189,9 +197,9 @@ def second(nums: list[str, ...]):
         maxi = max(int(summ), maxi)
 
     print(maxi)
+    return maxi
 
 
-
-# first(read())
-
+first(read())
 second(read())
+
