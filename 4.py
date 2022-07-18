@@ -3,8 +3,8 @@ from tabulate import tabulate
 
 
 
-def readBingo():
-    with open('./data/4.csv') as f:
+def readBingo(loc: str) -> tuple[list[int], list[list[int]]]:
+    with open(loc) as f:
         first_row = f.readline()
         draws = list(map(int, first_row.split(",")))
 
@@ -33,8 +33,8 @@ def printBoard(board: list[int], name: str = ""):
 
 
 
-def first():
-    draws, boards = readBingo()
+def first(loc: str = './data/4.csv'):
+    draws, boards = readBingo(loc)
     for k in range(len(draws)):
         for x in boards:
             if results := boardWon(x, draws[:k]):
@@ -46,8 +46,8 @@ def first():
                 return a
 
 
-def second():
-    draws, boards = readBingo()
+def second(loc: str = './data/4.csv'):
+    draws, boards = readBingo(loc)
     wins_at = 0
     wins_val = 0
     for board in boards:
@@ -61,3 +61,5 @@ def second():
     print(f"Worst board wins after {wins_at} turns, with final score {wins_val}.")
     return wins_val
 
+first()
+second()

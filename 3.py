@@ -1,72 +1,55 @@
-import csv
-import numpy as np
+def read(loc: str) -> list:
+    with open(loc) as f:
+        r = f.readlines()
+        data = [[int(x, 2) for x in row.strip()] for row in r]
+        return data
 
 
-def first():
-    with open("./data/3.csv") as f:
-        data = [[int(x) for x in row[0]] for row in csv.reader(f)]
+def first(loc: str = "./data/3.csv") -> int:
+    data = read(loc)
+
     sums = [0] * len(data[0])
-    for x in data:
-        for k, y in enumerate(x):
-            sums[k] += y
+    for row in data:
+        for column, val in enumerate(row):
+            sums[column] += val
 
     gamma = "".join([str(int(k > len(data) // 2)) for k in sums])
     epsilon = "".join('1' if x == '0' else '0' for x in gamma)
 
-    print(gamma)
-    print(epsilon)
-    print(int(gamma, 2) * int(epsilon, 2))
-    print(len(data))
-    print(data)
-    print(sums)
+    res = int(gamma, 2) * int(epsilon, 2)
+    print(res)
+    return res
 
 
-def second():
-    with open("./data/3.csv") as f:
-        data = [[int(x) for x in row[0]] for row in csv.reader(f)]
-
+def second(loc: str = "./data/3.csv") -> int:
+    data = read(loc)
     nums = data
-    for k in range(len(data[0])):
-        # filt = filterGood(nums, k, (1, 0))
-        # nums = max(filt.values(), key=len)
-        nums0, nums1 = filte(nums, k)
-        if len(nums0) > len(nums1):
-            nums = nums0
-        else:
-            nums = nums1
-    gamma = int("".join(str(x) for x in nums[0]), 2)
 
+    # oxygen / most common bit
+    k = 0
+    while len(nums) > 1:
+        sums = sum(row[k] for row in nums)
+        bit: int = int(sums >= (len(nums) + 1) // 2)
+        nums = list(filter(lambda l: l[k] == bit, nums))
+        k += 1
+    assert len(nums) == 1
+    oxygen_rating = int("".join(map(str,nums[0])), 2)
+
+    # CO2 scrubber rating / least common bit
     nums = data
-    for k in range(len(data[0])):
-        if len(nums) == 1:
-            break
-        nums0, nums1 = filte(nums, k)
-        if len(nums0) <= len(nums1):
-            nums = nums0
-        else:
-            nums = nums1
-    epsilon = int("".join(str(x) for x in nums[0]), 2)
+    k = 0
+    while len(nums) > 1:
+        sums = sum(row[k] for row in nums)
+        bit: int = int(sums < len(nums) // 2)
+        nums = list(filter(lambda l: l[k] == bit, nums))
+        k += 1
+    assert len(nums) == 1
+    co2_rating = int("".join(map(str,nums[0])), 2)
 
-    print(f"{gamma=}, {epsilon=}, {gamma*epsilon=}")
-
-
-def filte(nums: [[int, ...]], pos: int, flip: bool = False):
-    nums0 = [x for x in nums if x[pos] == 0]
-    nums1 = [x for x in nums if x[pos] == 1]
-
-    return nums0, nums1
+    res = oxygen_rating * co2_rating 
+    print(res)
+    return res
 
 
-def filterGood(nums: [[...]], pos: int, sieve: ()):
-    results = {
-        k: [] for k in sieve
-    }
-    for x in nums:
-        try:
-            results[x[pos]].append(x)
-        except KeyError:
-            pass
-    return results
-
-
+first()
 second()

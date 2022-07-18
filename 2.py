@@ -1,11 +1,14 @@
-import csv
+def read(loc: str = "./data/2.csv") -> list[tuple[str, int]]:
+    with open(loc) as f:
+        r = f.readlines()
+        rows = [row.split() for row in r]
+        return [(row[0], int(row[1])) for row in rows]
 
-def first():
+
+def first() -> int:
     horizontalPos = 0
     depth = 0
-    with open("./data/2.csv") as f:
-        reader = csv.reader(f, delimiter=' ')
-        data = [(x[0], int(x[1])) for x in reader]
+    data = read()
     for x, k in data:
         if x == 'forward':
             horizontalPos += k
@@ -13,15 +16,16 @@ def first():
             depth -= k
         if x == 'down':
             depth += k
-    print(f"{horizontalPos=}, {depth=}, {horizontalPos*depth=}")
+    res = horizontalPos*depth
+    print(res)
+    return res
 
-def second():
+
+def second() -> int:
     horizontalPos = 0
     depth = 0
     aim = 0
-    with open("./data/2.csv") as f:
-        reader = csv.reader(f, delimiter=' ')
-        data = [(x[0], int(x[1])) for x in reader]
+    data = read()
     for x, k in data:
         if x == 'forward':
             horizontalPos += k
@@ -30,7 +34,10 @@ def second():
             aim -= k
         if x == 'down':
             aim += k
-    print(f"{horizontalPos=}, {depth=}, {horizontalPos*depth=}")
+    res = horizontalPos*depth
+    print(res)
+    return res
 
 
+first()
 second()

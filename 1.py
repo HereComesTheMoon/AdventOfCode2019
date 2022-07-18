@@ -1,33 +1,21 @@
-import csv
+def read(loc: str) -> list[int]:
+    with open(loc) as f:
+        r = f.readlines()
+        return [int(row) for row in r]
 
-def first():
-    count = 0
-    with open("./data/day1.csv") as f:
-        reader = csv.reader(f)
-        last = int(reader.__next__()[0])
-        for x in reader:
-            x = int(x[0])
-            if x > last:
-                count += 1
-            last = x
-    return count
+def first(loc: str = "./data/1.csv") -> int:
+    vals = read(loc)
+    res = sum(vals[k+1] > vals[k] for k in range(len(vals) - 1))
+    print(res)
+    return res
 
 
-def second():
-    with open("./data/day1.csv") as f:
-        data = [int(x[0]) for x in csv.reader(f)]
-        print(data)
+def second(loc: str = "./data/1.csv") -> int:
+    vals = read(loc)
+    res = sum(vals[k+3] > vals[k] for k in range(len(vals) - 3))
+    print(res)
+    return res
 
-    count = 0
-    current = data[0]+data[1]+data[2]
-    last = current
-    for i in range(3, len(data)):
-        current = current + data[i] - data[i-3]
-        if current > last:
-            count += 1
-        last = current
 
-    return count
-
-print(first())
-print(second())
+first()
+second()

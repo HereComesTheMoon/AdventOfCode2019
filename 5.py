@@ -2,8 +2,8 @@ from collections import namedtuple
 
 Point = namedtuple('Point', 'x y')
 
-def read():
-    with open('./data/5.csv') as f:
+def read(loc: str):
+    with open(loc) as f:
         r = f.readlines()
         rows = [row.replace(" -> ", ",") for row in r]
         rows = [row.split(",") for row in rows]
@@ -29,9 +29,9 @@ def line2(p: Point, q: Point) -> list[tuple[int, int]]:
 
     return []
 
-def first():
+def first(loc: str = './data/5.csv') -> int:
     karte = [[0 for _ in range(1000)] for _ in range(1000)] # 1000 ~ bound for highest appearing value.
-    for x, y in read():
+    for x, y in read(loc):
         for a, b in line(x, y):
             karte[a][b] += 1
 
@@ -40,11 +40,12 @@ def first():
         for column in row:
            count += (column >= 2)
 
+    print(count)
     return count
 
-def second():
+def second(loc: str = './data/5.csv') -> int:
     karte = [[0 for _ in range(1000)] for _ in range(1000)]
-    for x, y in read():
+    for x, y in read(loc):
         for a, b in line2(x, y):
             karte[a][b] += 1
 
@@ -53,5 +54,9 @@ def second():
         for column in row:
             count += (column >= 2)
 
+    print(count)
     return count
+
+first()
+second()
 
