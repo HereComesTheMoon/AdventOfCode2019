@@ -1,34 +1,21 @@
-import pprint
+def read(loc: str) -> tuple[str, list[str]]:
+    with open(loc) as f:
+        r = f.readlines()
+        alg = r[0].strip()
+        img = [row.strip() for row in r[2:]]
+    return alg, img
 
 
-def read_alg():
-    with open('./data/20a.csv') as f:
-        r = f.readline()
-        assert len(r[:-1]) == 512
-        return r[:-1]
-
-
-def read_img():
-    with open('./data/20b.csv') as f:
-        img = []
-        for line in f.readlines():
-            img.append(line[:-1])
-        return img
-
-
-def pad_img(img: list[str, ...], char: str = '.'):
-    new_img = [char*(len(img[0]) + 2)] + [char + line + char for line in img] + [char*(len(img[0]) + 2)]
-    for x in new_img:
-        assert len(new_img[0]) == len(x)
+def pad_img(img: list[str], pad: str = '.'):
+    new_img = [pad*(len(img[0]) + 2)] + [pad + line + pad for line in img] + [pad*(len(img[0]) + 2)]
     return new_img
 
 
-def enhance(img: list[str,...], padding: str = '.'):
-    padded = pad_img(pad_img(img, padding), padding)
-    alg = read_alg()
+def enhance(alg: str, img: list[str], padding: str = '.'):
+    padded = pad_img(pad_img(img, padding), padding) # Pad twice
     new_img = []
     for i in range(1, len(padded)-1):
-        new_line = [""] * (len(padded[0]))
+        new_line = [""] * len(padded[0])
         for j in range(1, len(padded[0]) - 1):
             nghbrs = padded[i-1][j-1:j+2] + padded[i][j-1:j+2] + padded[i+1][j-1:j+2]
             indx = "".join(['1' if x == '#' else '0' for x in nghbrs ])
@@ -37,36 +24,47 @@ def enhance(img: list[str,...], padding: str = '.'):
     return new_img
 
 
-def first():
-    im = enhance(read_img())
-    # im = enhance(["...", "...", "..."])
-    im = enhance(im, "#")
-    counter = 0
-    for x in im:
-        print(x)
-        for c in x:
-            if c == '#':
-                counter += 1
-    print(counter)
+def print_image(img: list[str]):
+    print(f"Printing image of dimensions: x: {len(img[0])}, y: {len(img)}")
+    for row in img:
+        assert len(row) == len(img[0])
+        print(len(row), row)
 
 
-def second():
-    im = read_img()
-    # im = ["...", "...", "..."]
+def iterate_enhance(alg: str, img: list[str], n: int) -> list[str]:
+    pads = {
+            '.': alg[0],
+            '#': alg[-1],
+            }
     pad = '.'
-    for k in range(50):
-        im = enhance(im, pad)
-        if pad == '.':
-            pad = '#'
-        else:
-            pad = '.'
-    counter = 0
-    for x in im:
-        print(x)
-        for c in x:
-            if c == '#':
-                counter += 1
+    for _ in range(n):
+        img = enhance(alg, img, pad)
+        pad = pads[pad]
+    return img
+
+
+def count_lit_pixels(img: list[str]) -> int:
+    return sum(row.count("#") for row in img)
+
+
+def first(loc: str = "./data/20.csv") -> int:
+    alg, img = read(loc)
+    img = iterate_enhance(alg, img, 2)
+    counter = count_lit_pixels(img)
     print(counter)
+    return counter
 
 
+def second(loc: str = "./data/20.csv") -> int:
+    alg, img = read(loc)
+    img = iterate_enhance(alg, img, 50)
+    counter = count_lit_pixels(img)
+    print(counter)
+    return counter
+
+
+
+first("./data/20test.csv")
+second("./data/20test.csv")
+first()
 second()
