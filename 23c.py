@@ -1,7 +1,7 @@
 from collections import Counter
-from typing import NamedTuple, Final, Iterable, Union, Generator
+from typing import NamedTuple, Final, Generator
 import heapq
-from math import inf
+from math import cos, inf
 from itertools import chain
 # from tabulate import tabulate
 
@@ -31,6 +31,12 @@ class State:
             'C': 6,
             'D': 8,
         }
+    room_energy = {
+            'A': 1,
+            'B': 10,
+            'C': 100,
+            'D': 1000,
+            }
 
     def __init__(self, hallway: str, rooms: Rooms, energy: int) -> None:
         assert len(hallway) == 11 # Hallway is 11 tiles long
@@ -64,7 +70,7 @@ class State:
         for k in range(max(len(room) for room in self.rooms)):
             row = ["  |"] + [self.rooms[i][k] + "|" if k < len(self.rooms[k]) else "~|" for i in range(4)] + ["   \n"]
             rep += "".join(row)
-        
+
         return rep[:-1].replace(" ", ".")
 
 
@@ -124,7 +130,7 @@ class State:
         return True
 
 
-    def check_move(self, start: tuple[str, int], goal: tuple[str, int]) -> bool:
+    def verify_move(self, start: tuple[str, int], goal: tuple[str, int]) -> bool:
         match start, goal:
             case ('H', _), ('H', _):
                 assert False
@@ -136,20 +142,16 @@ class State:
                 assert goal[1] in range(len(self.rooms[room_index]))
 
                 # Check that we are moving into the right room
-                if self.hallway[s] != goal[0]:
-                    return False
+                assert self.hallway[s] == goal[0]
 
                 # Check that the hallway is free
                 if s < room_place:
-                    if any(tile != ' ' for tile in self.hallway[s+1:room_place+1]):
-                        return False
+                    assert all(tile == ' ' for tile in self.hallway[s+1:room_place+1])
                 else:
-                    if any(tile != ' ' for tile in self.hallway[room_place:s]):
-                        return False
+                    assert all(tile == ' ' for tile in self.hallway[room_place:s])
 
                 # Check that the room is free
-                if any(tile != ' ' for tile in self.rooms[room_index][0:goal[1]+1]):
-                    return False
+                assert all(tile == ' ' for tile in self.rooms[room_index][0:goal[1]+1])
                 return True
             case _, ('H', _):
                 g = goal[1]
@@ -160,25 +162,20 @@ class State:
                 assert start[1] in range(len(self.rooms[room_index]))
                 assert amphipod_type != ' '
 
-                # Check that we are not moving onto a tile in front of a room 
-                if g in State.room_place.values():
-                    return False
+                # Check that we are not moving onto a tile in front of a room
+                assert g not in State.room_place.values()
 
                 # Check that the hallway is free
                 if g < room_place:
-                    if any(tile != ' ' for tile in self.hallway[g:room_place+1]):
-                        return False
+                    assert all(tile == ' ' for tile in self.hallway[g:room_place+1])
                 else:
-                    if any(tile != ' ' for tile in self.hallway[room_place:g+1]):
-                        return False
+                    assert all(tile == ' ' for tile in self.hallway[room_place:g+1])
 
                 # Check that the space in the room in front of us is free
-                if any(tile != ' ' for tile in self.rooms[room_index][0:start[1]]):
-                    return False
+                assert all(tile == ' ' for tile in self.rooms[room_index][0:start[1]])
 
                 # Check that we are not in position in our room yet
-                if all(tile == start[0] for tile in self.rooms[room_index][start[1]:]):
-                    return False
+                assert any(tile != start[0] for tile in self.rooms[room_index][start[1]:])
                 return True
 
             case _:
@@ -195,21 +192,17 @@ class State:
                 assert goal[1] in range(len(goal_room))
 
                 hallway_range = self.hallway[min(start_room_place, goal_room_place):max(start_room_place, goal_room_place) + 1]
-                # Check that hallway is free 
-                if any(tile != ' ' for tile in hallway_range):
-                    return False
+                # Check that hallway is free
+                assert all(tile == ' ' for tile in hallway_range)
 
                 # Check that the space in the room in front of us is free
-                if any(tile != ' ' for tile in start_room[0:start[1]]):
-                    return False
+                assert all(tile == ' ' for tile in start_room[0:start[1]])
 
-                # check that goal room has no wrong amphipods in it 
-                if any(tile != amphipod_type for tile in goal_room[goal[1]+1:]):
-                    return False
+                # check that goal room has no wrong amphipods in it
+                assert all(tile == amphipod_type for tile in goal_room[goal[1]+1:])
 
-                # Check that tiles in goal room are free 
-                if any(tile != ' ' for tile in goal_room[:goal[1]+1]):
-                    return False
+                # Check that tiles in goal room are free
+                assert all(tile == ' ' for tile in goal_room[:goal[1]+1])
 
                 return True
 
@@ -222,14 +215,32 @@ class State:
         if self.hallway[tile] == ' ':
             l += 1
 
-        r = tile 
+        r = tile
         while r < len(self.hallway) and self.hallway[r] == ' ':
             r += 1
 
         return l, r
 
+    def necessary_energy_to_move(self, start: tuple[str, int], goal: tuple[str, int]) -> int:
+        match start, goal:
+            case ('H', _), ('H', _):
+                assert False
+            case ('H', _), _:
+                amphipod_type = self.hallway[start[1]]
+                steps = abs(start[1] - State.room_place[goal[0]]) + (goal[1] + 1)
+            case _, ('H', _):
+                amphipod_type = self.rooms[State.room_index[start[0]]][start[1]]
+                steps = abs(goal[1] - State.room_place[start[0]]) + (start[1] + 1)
+            case _:
+                amphipod_type = self.rooms[State.room_index[start[0]]][start[1]]
+                steps = abs(State.room_place[goal[0]] - State.room_place[start[0]]) + (start[1] + 1) + (goal[1] + 1)
+
+        cost_per_tile = State.room_energy[amphipod_type]
+        energy = steps*cost_per_tile
+        return energy
+
     def move(self, start: tuple[str, int], goal: tuple[str, int]) -> "State":
-        assert self.check_move(start, goal)
+        assert self.verify_move(start, goal)
         match start, goal:
             case ('H', _), ('H', _):
                 assert False
@@ -238,24 +249,30 @@ class State:
                 room_index = State.room_index[goal[0]]
                 ro = list(self.rooms)
                 _ro = self.rooms[room_index]
-                ro[room_index] = _ro[:goal[1]] + start[0] + _ro[goal[1]+1:]
-                new_state = State(hw, Rooms(*ro), 0)
+                ro[room_index] = _ro[:goal[1]] + goal[0] + _ro[goal[1]+1:]
+                new_state = State(hw, Rooms(*ro), self.energy + self.necessary_energy_to_move(start, goal))
             case _, ('H', _):
                 room_index = State.room_index[start[0]]
                 hw = self.hallway[:goal[1]] + self.rooms[room_index][start[1]] + self.hallway[goal[1]+1:]
                 ro = list(self.rooms)
                 _ro = self.rooms[room_index]
                 ro[room_index] = _ro[:start[1]] + " " + _ro[start[1]+1:]
-                print(hw)
-                print(ro)
-                new_state = State(hw, Rooms(*ro), 0)
+                new_state = State(hw, Rooms(*ro), self.energy + self.necessary_energy_to_move(start, goal))
             case _:
-                hw = self.hallway[:goal[1]] + (" ") + self.hallway[goal[1]+1:]
-                room_index = State.room_index[start[0]]
+                hw = self.hallway
+                start_room_index = State.room_index[start[0]]
+                # start_room_place = State.room_place[start[0]]
+                goal_room_index = State.room_index[goal[0]]
+                # goal_room_place = State.room_place[goal[0]]
+                # amphipod_type = start_room[start[1]]
+
+                # room_index = State.room_index[start[0]]
                 ro = list(self.rooms)
-                _ro = self.rooms[room_index]
-                ro[room_index] = _ro[:start[1]] + goal[0] + _ro[start[1]+1:]
-                new_state = State(hw, Rooms(*ro), 0)
+                ro_start = self.rooms[start_room_index]
+                ro_goal = self.rooms[goal_room_index]
+                ro[start_room_index] = ro_start[:start[1]] + ' ' + ro_start[start[1]+1:]
+                ro[goal_room_index] = ro_goal[:goal[1]] + goal[0] + ro_goal[goal[1]+1:]
+                new_state = State(hw, Rooms(*ro), self.energy + self.necessary_energy_to_move(start, goal))
         assert new_state.verify_state()
         return new_state
         # next_state = State(
@@ -278,17 +295,17 @@ class State:
         for amphipod_type, room in zip(State.room_index, self.rooms):
             first_occupied_tile = rooms_first[amphipod_type]
             goal = (amphipod_type, first_occupied_tile - 1)
-            if first_occupied_tile == len(room): # Room empty
-                continue
+            # if first_occupied_tile == len(room): # Room empty
+                # continue
             if any(tile != amphipod_type for tile in room[first_occupied_tile:]): # Can't move into this room yet
                 continue
             l, r = self.visible_hallway_space(State.room_place[amphipod_type])
             if 0 < l and self.hallway[l - 1] == amphipod_type:
                 yield self.move(("H", l-1), goal)
-            if r < len(self.hallway) - 1 and self.hallway[r] == amphipod_type:
+            if r < len(self.hallway) and self.hallway[r] == amphipod_type:
                 yield self.move(("H", r), goal)
             for start_room_name, k in State.room_index.items():
-                start_i = rooms_first[start_room_name] 
+                start_i = rooms_first[start_room_name]
                 if start_i == len(self.rooms[k]):
                     continue
                 if self.rooms[k][start_i] != amphipod_type:
@@ -303,6 +320,8 @@ class State:
             start_i = rooms_first[start_room_name]
             if start_i == len(self.rooms[k]):
                 continue
+            if all(tile == start_room_name for tile in self.rooms[k][start_i:]):
+                continue
             l, r = self.visible_hallway_space(State.room_place[start_room_name])
             for tile in range(l, r):
                 if tile in State.room_place.values():
@@ -311,7 +330,6 @@ class State:
 
         return None
 
-            
 
 class PriorityQueue():
     def __init__(self, starting_list: list[State]) -> None:
@@ -331,15 +349,6 @@ class PriorityQueue():
         return bool(self.q)
 
 
-    # def binary_search(self, goal: State) -> int:
-        # current = 0
-        # while goal < self.q[current]:
-            # pass
-
-    # def siftdown(self, startpos: int, pos: int):
-        # heapq._siftdown(self.q, startpos, pos)
-
-
 class Game:
     def __init__(self, starting_state: State) -> None:
         starting_state.verify_state()
@@ -357,19 +366,15 @@ class Game:
 
     def search(self) -> int:
         while self.frontier:
-            print("h")
             visiting = self.frontier.get()
+            print(visiting)
             if visiting in self.visited:
-                print("heh, not this time kiddo")
-                break
+                continue
             self.visited.add(visiting)
             if visiting == self.goal_state:
-                print("Huzzah")
-                print(visiting.energy)
                 return(visiting.energy)
             for node in visiting.neighbours():
                 if node not in self.visited:
-                    print("ha")
                     self.frontier.put(node)
         return -1
 
@@ -386,63 +391,113 @@ def test():
 
     rooms = Rooms("  ", "BB", "CA", " D")
     state = State("CA       D ", rooms, 0)
-    print(state.check_move(("H", 1), ("A", 1)))
-    print(state.check_move(("H", 0), ("A", 1)))
-    print(state.check_move(("H", 0), ("B", 1)))
-    print(state.check_move(("H", 9), ("D", 1)))
-    print(state.check_move(("H", 9), ("D", 0)))
+    print(state.verify_move(("H", 1), ("A", 1)))
+    print(state.verify_move(("H", 0), ("A", 1)))
+    print(state.verify_move(("H", 0), ("B", 1)))
+    print(state.verify_move(("H", 9), ("D", 1)))
+    print(state.verify_move(("H", 9), ("D", 0)))
     print()
     print(state)
     try:
-        state.check_move(("A", 0), ("H", 0))
-        state.check_move(("A", 1), ("H", 0))
-        state.check_move(("A", 0), ("H", 1))
-        state.check_move(("A", 1), ("H", 1))
-        state.check_move(("A", 0), ("H", 2))
-        state.check_move(("A", 1), ("H", 2))
-        state.check_move(("A", 0), ("H", 3))
-        state.check_move(("A", 1), ("H", 3))
+        state.verify_move(("A", 0), ("H", 0))
+        state.verify_move(("A", 1), ("H", 0))
+        state.verify_move(("A", 0), ("H", 1))
+        state.verify_move(("A", 1), ("H", 1))
+        state.verify_move(("A", 0), ("H", 2))
+        state.verify_move(("A", 1), ("H", 2))
+        state.verify_move(("A", 0), ("H", 3))
+        state.verify_move(("A", 1), ("H", 3))
     except AssertionError:
         pass
 
 
-    assert state.check_move(("B", 0), ("H", 0)) == False
-    assert state.check_move(("B", 1), ("H", 0)) == False
-    assert state.check_move(("B", 0), ("H", 1)) == False
-    assert state.check_move(("B", 1), ("H", 1)) == False
-    assert state.check_move(("B", 0), ("H", 2)) == False
-    assert state.check_move(("B", 1), ("H", 2)) == False
-    assert state.check_move(("B", 0), ("H", 3)) == False
-    assert state.check_move(("B", 1), ("H", 3)) == False
+    assert state.verify_move(("B", 0), ("H", 0)) == False
+    assert state.verify_move(("B", 1), ("H", 0)) == False
+    assert state.verify_move(("B", 0), ("H", 1)) == False
+    assert state.verify_move(("B", 1), ("H", 1)) == False
+    assert state.verify_move(("B", 0), ("H", 2)) == False
+    assert state.verify_move(("B", 1), ("H", 2)) == False
+    assert state.verify_move(("B", 0), ("H", 3)) == False
+    assert state.verify_move(("B", 1), ("H", 3)) == False
 
-    assert state.check_move(("C", 0), ("H", 0)) == False
-    assert state.check_move(("C", 0), ("H", 1)) == False
-    assert state.check_move(("C", 0), ("H", 2)) == False
-    assert state.check_move(("C", 0), ("H", 3)) == True
-    assert state.check_move(("C", 0), ("H", 4)) == False
-    assert state.check_move(("C", 0), ("H", 5)) == True
-    assert state.check_move(("C", 0), ("H", 6)) == False
-    assert state.check_move(("C", 0), ("H", 7)) == True
-    assert state.check_move(("C", 0), ("H", 8)) == False
-    assert state.check_move(("C", 0), ("H", 9)) == False
-    assert state.check_move(("C", 0), ("H", 10)) == False
+    assert state.verify_move(("C", 0), ("H", 0)) == False
+    assert state.verify_move(("C", 0), ("H", 1)) == False
+    assert state.verify_move(("C", 0), ("H", 2)) == False
+    assert state.verify_move(("C", 0), ("H", 3)) == True
+    assert state.verify_move(("C", 0), ("H", 4)) == False
+    assert state.verify_move(("C", 0), ("H", 5)) == True
+    assert state.verify_move(("C", 0), ("H", 6)) == False
+    assert state.verify_move(("C", 0), ("H", 7)) == True
+    assert state.verify_move(("C", 0), ("H", 8)) == False
+    assert state.verify_move(("C", 0), ("H", 9)) == False
+    assert state.verify_move(("C", 0), ("H", 10)) == False
 
 
     rooms = Rooms(" D", "BB", "CA", " D")
     state = State("CA         ", rooms, 0)
     print(state)
-    assert state.check_move(("A", 1), ("D", 0)) == True
+    assert state.verify_move(("A", 1), ("D", 0)) == True
     # assert state.check_move(("A", 0), ("D", 0)) == False
-    assert state.check_move(("A", 1), ("D", 1)) == False
+    assert state.verify_move(("A", 1), ("D", 1)) == False
     # assert state.check_move(("A", 1), ("C", 1)) == False
     # assert state.check_move(("A", 1), ("C", 0)) == False
 
 
-rooms = Rooms("BA", "CD", "BC", "DA")
-state = State("           ", rooms, 0)
+def example():
+    rooms = Rooms("BA", "CD", "BC", "DA")
+    state = State("           ", rooms, 0)
+    g = Game(state)
+    goal_states = [
+        State("           ", Rooms("BA", "CD", "BC", "DA"), 0),
+        State("   B       ", Rooms("BA", "CD", " C", "DA"), 0),
+        State("   B       ", Rooms("BA", " D", "CC", "DA"), 0),
+        State("   B D     ", Rooms("BA", "  ", "CC", "DA"), 0),
+        State("     D     ", Rooms("BA", " B", "CC", "DA"), 0),
+        State("     D     ", Rooms(" A", "BB", "CC", "DA"), 0),
+        State("     D D   ", Rooms(" A", "BB", "CC", " A"), 0),
+        State("     D D A ", Rooms(" A", "BB", "CC", "  "), 0),
+        State("     D   A ", Rooms(" A", "BB", "CC", " D"), 0),
+        State("         A ", Rooms(" A", "BB", "CC", "DD"), 0),
+        State("           ", Rooms("AA", "BB", "CC", "DD"), 0),
+            ]
+    g.goal_state = goal_states.pop()
+    g.goal_state.verify_state()
+    energy = g.search()
+    print(energy)
+    assert energy == 12521
 
-state.verify_state()
+def example2():
+    rooms = Rooms("BDDA", "CCBD", "BBAC", "DACA")
+    state = State("           ", rooms, 0)
+    g = Game(state)
+    g.goal_state = State("           ", Rooms("AAAA", "BBBB", "CCCC", "DDDD"), 0)
+    energy = g.search()
+    print(energy) # 46160
+    assert energy == 44169
+    return energy
 
-g = Game(state)
-g.search()
+def first() -> int:
+    rooms = Rooms("AC", "DC", "AD", "BB")
+    state = State("           ", rooms, 0)
+    g = Game(state)
+    energy = g.search()
+    print(energy)
+    return energy
 
+def second() -> int:
+    rooms = Rooms("ADDC", "DCBC", "ABAD", "BACB")
+    state = State("           ", rooms, 0)
+    g = Game(state)
+    energy = g.search()
+    print(energy)
+    return energy
+
+def second_test() -> int:
+    rooms = Rooms(" AAA", "BBBB", "CCCC", "DDDD")
+    state = State("          A", rooms, 0)
+    g = Game(state)
+    energy = g.search()
+    print(energy)
+    return energy
+
+second()
