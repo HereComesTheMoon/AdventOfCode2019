@@ -1,9 +1,9 @@
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 12
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -16,14 +16,15 @@ add y w
 add y 4
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 15
-inp w 0
 eql x w
 eql x 0
+mul y 0
 add y 25
 mul y x
 add y 1
@@ -33,13 +34,12 @@ add y w
 add y 11
 mul y x
 add z y
-inp w 0
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 11
-mul y 0
 eql x w
 eql x 0
 mul y 0
@@ -52,12 +52,12 @@ add y w
 add y 7
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -14
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -70,12 +70,12 @@ add y w
 add y 2
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 12
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -88,12 +88,12 @@ add y w
 add y 11
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -10
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -106,12 +106,12 @@ add y w
 add y 13
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 11
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -124,12 +124,12 @@ add y w
 add y 9
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 13
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -142,12 +142,12 @@ add y w
 add y 12
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -7
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -160,12 +160,12 @@ add y w
 add y 6
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 1
 add x 10
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -178,12 +178,12 @@ add y w
 add y 2
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -2
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -196,12 +196,12 @@ add y w
 add y 11
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -1
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -214,12 +214,12 @@ add y w
 add y 12
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -4
-inp w 0
 eql x w
 eql x 0
 mul y 0
@@ -232,12 +232,12 @@ add y w
 add y 3
 mul y x
 add z y
+inp w
 mul x 0
 add x z
 mod x 26
 div z 26
 add x -12
-inp w 0
 eql x w
 eql x 0
 mul y 0
