@@ -115,7 +115,7 @@ def decode(cypher: dict[str, str], vals: tuple[str, str, str, str]) -> int:
     return val
 
 
-def first(loc: str) -> int:
+def first(loc: str = "./data/8.csv") -> int:
     _, out = read(loc)
     appearances = 0
     for row in out:
@@ -127,7 +127,7 @@ def first(loc: str) -> int:
     return(appearances)
 
 
-def second(loc: str) -> int:
+def second(loc: str = "./data/8.csv") -> int:
     a, b = read(loc)
 
     val = 0
@@ -138,6 +138,7 @@ def second(loc: str) -> int:
     print(val)
     return val
 
-first("./data/8.csv")
-second("./data/8.csv")
+if __name__ == '__main__':
+    first()
+    second()
 

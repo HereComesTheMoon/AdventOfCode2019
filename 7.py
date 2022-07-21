@@ -1,6 +1,3 @@
-import csv
-import functools
-from math import inf
 from typing import Callable
 
 
@@ -8,7 +5,6 @@ def read(loc: str) -> list[int]:
     """Returns list of ints, positions of crab subs."""
     with open(loc) as f:
         data = list(map(int, f.readline().split(",")))
-        # data = list(map(int, csv.reader(f).__next__()))
     return data
 
 
@@ -25,7 +21,7 @@ def weightOfCurrentPos(initPos: list[int], targetPos: int) -> int:
 
 # Just for fun. Check unimodality. Knowing that a function is unimodal can in principle be used to vastly reduce the computations in
 # problems like these, where finding a minimum is required.
-# These two functions are not used
+# These two functions are not used.
 def _isUnimodal(func: Callable[[int], int], lower: int, upper: int):
     """Takes a function taking an int, and returning an int, and checks if it is unimodal for integer values a <= k <= b.
     Only enter function that always returns the same values for same inputs, of course. Ideally: Use @functools.cache"""
@@ -71,7 +67,7 @@ def _isUnimodalList(nums: list[int]):
     return False
 
 
-def first(loc: str) -> int:
+def first(loc: str = './data/7.csv') -> int:
     data = read(loc)
     smallest = weightOfCurrentPos(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):
@@ -80,7 +76,7 @@ def first(loc: str) -> int:
     return smallest
 
 
-def second(loc: str) -> int:
+def second(loc: str = './data/7.csv') -> int:
     data = read(loc)
     smallest = weightOfCurrentPosSecond(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):
@@ -88,6 +84,7 @@ def second(loc: str) -> int:
     print(smallest)
     return smallest
 
-first('./data/7.csv')
-second('./data/7.csv')
+if __name__ == '__main__':
+    first()
+    second()
 

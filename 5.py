@@ -57,6 +57,8 @@ def second(loc: str = './data/5.csv') -> int:
     print(count)
     return count
 
-first()
-second()
+
+if __name__ == '__main__':
+    first()
+    second()
 

@@ -1,7 +1,7 @@
 import math
-from collections import namedtuple
+from typing import NamedTuple
 
-target = namedtuple('Target', 'x_min x_max y_min y_max')
+target = NamedTuple('Target', [('x_min', int), ('x_max', int), ('y_min', int), ('y_max', int)])
 
 t: tuple[int, int, int, int] = target(0,1,2,3)
 
@@ -9,13 +9,13 @@ t: tuple[int, int, int, int] = target(0,1,2,3)
 # This was way more work than it should have been. Trying to be clever was a bad idea. This here was severely cleaned up, and it is still not pretty.
 
 
-def read(loc: str) -> tuple[int, int, int, int]:
+def read(loc: str) -> target:
     with open(loc) as f:
         r = f.readline()[15:-1]
         x_part, y_part = r.split(", y=")
         x_min, x_max = map(int, x_part.split(".."))
         y_min, y_max = map(int, y_part.split(".."))
-        t: tuple[int, int, int, int] = target(x_min, x_max, y_min, y_max)
+        t: target = target(x_min, x_max, y_min, y_max)
         return t
 
 
@@ -96,9 +96,10 @@ def second(t: target) -> int:
     return res
 
 
-t = read("./data/17.csv")
 
 
-first2(t)
-second(t)
+if __name__ == '__main__':
+    t = read("./data/17.csv")
+    first2(t)
+    second(t)
 

@@ -120,6 +120,7 @@ def second() -> int:
     return res
 
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()
 

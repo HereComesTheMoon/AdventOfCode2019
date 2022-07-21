@@ -1,6 +1,3 @@
-import csv
-
-
 class Node:
     def __init__(self, name: str, nbrs: set['Node'], end: bool = False):
         self.name = name
@@ -13,10 +10,6 @@ class Node:
 
     def __repr__(self):
         return self.name
-        rep = ""
-        for x in self.nbrs:
-            rep += f"{x.name}, "
-        return rep[:-2]
 
     def __str__(self):
         return self.name
@@ -76,14 +69,14 @@ class Graph:
         for x in self.nodes:
             rep += f"{x.name}: {x.__repr__()}\n"
         return rep
-        # return str([(x.name, (x)) for x in self.nodes])
 
 
 def build_graph(loc: str):
     with open(loc) as f:
-        r = csv.reader(f, delimiter='-')
+        r = f.readlines()
         node_names = set()
-        for a, b in r:
+        for row in r:
+            a, b = row.split('-')
             node_names.add(a)
             node_names.add(b)
     nodes = {
@@ -91,9 +84,10 @@ def build_graph(loc: str):
     }
     G = Graph(nodes)
     with open(loc) as f:
-        r = csv.reader(f, delimiter='-')
-        for a, b in r:
-            G.add_edge(a, b)
+        r = f.readlines()
+        for row in r:
+            a, b = row.split('-')
+            G.add_edge(a.strip(), b.strip())
 
     return G
 
@@ -117,5 +111,6 @@ def second(loc: str = "./data/12.csv"):
     print(len(paths))
     return(len(paths))
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()

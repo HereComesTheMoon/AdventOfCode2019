@@ -200,6 +200,7 @@ def second(nums: list[str]):
     return maxi
 
 
-first(read())
-second(read())
+if __name__ == '__main__':
+    first(read())
+    second(read())
 

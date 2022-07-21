@@ -113,5 +113,6 @@ def second(loc: str = './data/22.csv') -> int:
     return vol
 
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()

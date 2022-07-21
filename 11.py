@@ -75,6 +75,7 @@ def second(loc: str = "./data/11.csv") -> int:
     return octopi.number_steps
 
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()
 

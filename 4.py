@@ -17,15 +17,15 @@ def readBingo(loc: str) -> tuple[list[int], list[list[int]]]:
     return draws, boards
 
 
-def boardWon(board: list[int], drawn: list[int]):
+def boardWon(board: list[int], drawn: list[int]) -> list[bool]:
     results = [x in drawn for x in board]
     for k in range(5):
         if all(results[k * 5:(k + 1) * 5]) or all(results[k:k + 25:5]):
             return results
-    return False
+    return []
 
 
-def printBoard(board: list[int], name: str = ""):
+def printBoard(board: list, name: str = ""):
     a = [board[k * 5:(k + 1) * 5] for k in range(5)]
     if name:
         print(name)
@@ -61,5 +61,7 @@ def second(loc: str = './data/4.csv'):
     print(f"Worst board wins after {wins_at} turns, with final score {wins_val}.")
     return wins_val
 
-first()
-second()
+
+if __name__ == '__main__':
+    first()
+    second()

@@ -64,7 +64,8 @@ def second(loc: str = "./data/20.csv") -> int:
 
 
 
-first("./data/20test.csv")
-second("./data/20test.csv")
-first()
-second()
+if __name__ == '__main__':
+    first("./data/20test.csv")
+    second("./data/20test.csv")
+    first()
+    second()

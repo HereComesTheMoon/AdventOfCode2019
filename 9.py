@@ -60,8 +60,6 @@ def findBasin(data: np.ndarray, i: int, j: int) -> set[tuple[int, int]]:
             continue
         seen[x, y] = 1
         for a, b in getNghbrs(n, m, x, y):
-            # if data[a, b] < data[x, y]:
-            #     continue
             if data[a, b] == 9 or seen[a, b]:
                 continue
             stack.append((a, b))
@@ -98,5 +96,6 @@ def second(loc: str = './data/9.csv') -> int:
     print(res)
     return res
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()

@@ -103,6 +103,7 @@ def second(loc: str = "./data/15.csv"):
     print(res)
     return res
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()
 

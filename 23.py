@@ -469,5 +469,6 @@ def second() -> int:
     return energy
 
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()

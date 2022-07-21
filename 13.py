@@ -37,8 +37,6 @@ def fold(grid: list[list[bool]], axis: str, pos: int) -> list[list[bool]]:
         return new_grid
 
 
-
-
 def build_grid(points: list[tuple[int, int]]) -> list[list[bool]]:
     n = max(points, key=lambda p: p[0])[0]
     m = max(points, key=lambda p: p[1])[1]
@@ -78,6 +76,7 @@ def second(loc: str = "./data/13.csv"):
     print_grid(grid)
 
 
-first()
-second()
+if __name__ == '__main__':
+    first()
+    second()
 

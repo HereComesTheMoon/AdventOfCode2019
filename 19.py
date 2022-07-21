@@ -166,5 +166,7 @@ def second() -> int:
 
 
 
-second()
+if __name__ == '__main__':
+    first()
+    second()
 
