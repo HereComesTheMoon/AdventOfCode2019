@@ -92,7 +92,7 @@ def build_graph(loc: str):
     return G
 
 
-def first(loc: str = "./data/12.csv"):
+def first(loc: str = "./data/12.txt"):
     G = build_graph(loc)
     start = G.get_node_by_name("start")
     end = G.get_node_by_name("end")
@@ -102,7 +102,7 @@ def first(loc: str = "./data/12.csv"):
     return(len(paths))
 
 
-def second(loc: str = "./data/12.csv"):
+def second(loc: str = "./data/12.txt"):
     G = build_graph(loc)
     start = G.get_node_by_name("start")
     end = G.get_node_by_name("end")

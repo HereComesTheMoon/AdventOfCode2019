@@ -29,7 +29,7 @@ def line2(p: Point, q: Point) -> list[tuple[int, int]]:
 
     return []
 
-def first(loc: str = './data/5.csv') -> int:
+def first(loc: str = './data/5.txt') -> int:
     karte = [[0 for _ in range(1000)] for _ in range(1000)] # 1000 ~ bound for highest appearing value.
     for x, y in read(loc):
         for a, b in line(x, y):
@@ -43,7 +43,7 @@ def first(loc: str = './data/5.csv') -> int:
     print(count)
     return count
 
-def second(loc: str = './data/5.csv') -> int:
+def second(loc: str = './data/5.txt') -> int:
     karte = [[0 for _ in range(1000)] for _ in range(1000)]
     for x, y in read(loc):
         for a, b in line2(x, y):

@@ -52,7 +52,7 @@ class Octopuses:
         return list(adj)
 
 
-def first(loc: str = "./data/11.csv") -> int:
+def first(loc: str = "./data/11.txt") -> int:
     octopi = Octopuses(loc)
     for _ in range(100):
         octopi.step()
@@ -61,7 +61,7 @@ def first(loc: str = "./data/11.csv") -> int:
     return octopi.flashes
 
 
-def second(loc: str = "./data/11.csv") -> int:
+def second(loc: str = "./data/11.txt") -> int:
     octopi = Octopuses(loc)
     previous_flashes = octopi.flashes
     grid_size = octopi.len_x * octopi.len_y

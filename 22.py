@@ -93,7 +93,7 @@ def solve(cubes: list[Cube]) -> int:
     return vol
 
 
-def first(loc: str = './data/22.csv') -> int:
+def first(loc: str = './data/22.txt') -> int:
     cubes = read(loc)
 
     filt = lambda cube: all(p in range(-50, 51) for p in chain(cube.small, cube.large))
@@ -104,7 +104,7 @@ def first(loc: str = './data/22.csv') -> int:
     return vol
 
 
-def second(loc: str = './data/22.csv') -> int:
+def second(loc: str = './data/22.txt') -> int:
     cubes: list[Cube] = read(loc) # Reversed, treat as stack and pop
     vol = solve(cubes)
 

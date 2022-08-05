@@ -47,7 +47,7 @@ def tuples_to_elements(d: dict[str, int], start: str):
     return elements
 
 
-def first(loc: str = "./data/14.csv", n: int = 10) -> int:
+def first(loc: str = "./data/14.txt", n: int = 10) -> int:
     start, d = read(loc)
     for k in range(n):
         print(f"{k} — length: {len(start)}:", start)
@@ -60,7 +60,7 @@ def first(loc: str = "./data/14.csv", n: int = 10) -> int:
     return res
 
 
-def second(loc: str = "./data/14.csv", n: int = 40) -> int:
+def second(loc: str = "./data/14.txt", n: int = 40) -> int:
     start, d = read(loc)
     # Format input
     dd = {

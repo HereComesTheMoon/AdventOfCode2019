@@ -61,14 +61,14 @@ def print_grid(grid: list[list[bool]]):
     print(f"Number of dots: {prnt.count('#')}")
 
 
-def first(loc: str = "./data/13.csv"):
+def first(loc: str = "./data/13.txt"):
     points, folds = read(loc)
     grid = build_grid(points)
     grid = fold(grid, folds[0][0], folds[0][1])
     print_grid(grid)
 
 
-def second(loc: str = "./data/13.csv"):
+def second(loc: str = "./data/13.txt"):
     points, folds = read(loc)
     grid = build_grid(points)
     for axis, pos in folds:

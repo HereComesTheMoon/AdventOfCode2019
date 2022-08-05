@@ -33,7 +33,7 @@ def printBoard(board: list, name: str = ""):
 
 
 
-def first(loc: str = './data/4.csv'):
+def first(loc: str = './data/4.txt'):
     draws, boards = readBingo(loc)
     for k in range(len(draws)):
         for x in boards:
@@ -46,7 +46,7 @@ def first(loc: str = './data/4.csv'):
                 return a
 
 
-def second(loc: str = './data/4.csv'):
+def second(loc: str = './data/4.txt'):
     draws, boards = readBingo(loc)
     wins_at = 0
     wins_val = 0

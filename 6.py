@@ -25,6 +25,6 @@ def second(loc: str, n: int):
 
 
 if __name__ == '__main__':
-    first('./data/6.csv', 80)
-    second('./data/6.csv', 256)
+    first('./data/6.txt', 80)
+    second('./data/6.txt', 256)
 

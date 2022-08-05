@@ -28,7 +28,7 @@ def completion_score(nums: list) -> int:
     return 5*completion_score(nums[1:]) + matches[nums[0]]
 
 
-def first(loc: str = './data/10.csv') -> int:
+def first(loc: str = './data/10.txt') -> int:
     matches = {
         '(': ')',
         '[': ']',
@@ -53,7 +53,7 @@ def first(loc: str = './data/10.csv') -> int:
     return res
 
 
-def second(loc: str = './data/10.csv') -> int:
+def second(loc: str = './data/10.txt') -> int:
     matches = {
         '(': ')',
         '[': ']',

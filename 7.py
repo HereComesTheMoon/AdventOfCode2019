@@ -67,7 +67,7 @@ def _isUnimodalList(nums: list[int]):
     return False
 
 
-def first(loc: str = './data/7.csv') -> int:
+def first(loc: str = './data/7.txt') -> int:
     data = read(loc)
     smallest = weightOfCurrentPos(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):
@@ -76,7 +76,7 @@ def first(loc: str = './data/7.csv') -> int:
     return smallest
 
 
-def second(loc: str = './data/7.csv') -> int:
+def second(loc: str = './data/7.txt') -> int:
     data = read(loc)
     smallest = weightOfCurrentPosSecond(data, 0) # Arbitrary value which is guaranteed to be high enough
     for k in range(min(data), max(data) + 1):

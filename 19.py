@@ -145,7 +145,7 @@ def manhattan(x: np.ndarray[int, np.dtype], y: np.ndarray[int, np.dtype]) -> int
 
 
 def first() -> int:
-    data = Scanner_Data("./data/19.csv")
+    data = Scanner_Data("./data/19.txt")
     beacons = set()
     for x in data.aligned_scanners:
         for y in x.points:
@@ -157,7 +157,7 @@ def first() -> int:
 
 
 def second() -> int:
-    data = Scanner_Data("./data/19.csv")
+    data = Scanner_Data("./data/19.txt")
 
     scanner_positions = [scanner.scanner_position for scanner in data.aligned_scanners]
     res = max(manhattan(x, y) for x, y in itertools.product(scanner_positions, scanner_positions))

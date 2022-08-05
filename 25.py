@@ -44,7 +44,7 @@ def stringify_grid(grid: list[list[str]]) -> str:
     return ''.join("".join(row) + '\n' for row in grid)
 
 
-def first(loc: str = './data/25.csv') -> int:
+def first(loc: str = './data/25.txt') -> int:
     grid = read(loc)
     new_grid = step(grid)
     counter = 1
@@ -63,6 +63,9 @@ def first(loc: str = './data/25.csv') -> int:
     print(counter)
     return counter
 
+def second():
+    print("There is no second problem. Merry Christmas!")
 
 if __name__ == '__main__':
     first()
+    second()

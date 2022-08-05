@@ -5,7 +5,7 @@ def read(loc: str) -> list:
         return data
 
 
-def first(loc: str = "./data/3.csv") -> int:
+def first(loc: str = "./data/3.txt") -> int:
     data = read(loc)
 
     sums = [0] * len(data[0])
@@ -21,7 +21,7 @@ def first(loc: str = "./data/3.csv") -> int:
     return res
 
 
-def second(loc: str = "./data/3.csv") -> int:
+def second(loc: str = "./data/3.txt") -> int:
     data = read(loc)
     nums = data
 

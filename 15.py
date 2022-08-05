@@ -90,14 +90,14 @@ def solve(grid: list[list[Node]]) -> int:
     return -1 # Unreachable.
 
 
-def first(loc: str = "./data/15.csv"):
+def first(loc: str = "./data/15.txt"):
     grid = read(loc)
     res = solve(grid)
     print(res)
     return res
 
 
-def second(loc: str = "./data/15.csv"):
+def second(loc: str = "./data/15.txt"):
     grid = read(loc, True)
     res = solve(grid)
     print(res)

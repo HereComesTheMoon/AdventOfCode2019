@@ -6,7 +6,7 @@ import typing
 # if statements to handle different cases. If I'd made them SnailfishNumbers, then this would've been easier
 # This code is kind of am ess in general
 
-def read(loc: str = './data/18.csv'):
+def read(loc: str = './data/18.txt'):
     with open(loc) as f:
         return [x[:-1] for x in f.readlines()]
 

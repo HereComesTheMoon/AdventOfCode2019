@@ -99,7 +99,7 @@ def second(t: target) -> int:
 
 
 if __name__ == '__main__':
-    t = read("./data/17.csv")
+    t = read("./data/17.txt")
     first2(t)
     second(t)
 

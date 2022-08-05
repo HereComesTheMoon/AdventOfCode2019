@@ -1,4 +1,4 @@
-def read(loc: str = "./data/2.csv") -> list[tuple[str, int]]:
+def read(loc: str = "./data/2.txt") -> list[tuple[str, int]]:
     with open(loc) as f:
         r = f.readlines()
         rows = [row.split() for row in r]

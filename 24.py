@@ -96,7 +96,7 @@ def check_parameter_predictions(pars: list[tuple[int, int, int]]) -> bool:
     return True
 
 
-def first(loc: str = './data/24.csv') -> int:
+def first(loc: str = './data/24.txt') -> int:
     pars = read_parameters(loc)
     check_parameter_predictions(pars)
 
@@ -112,7 +112,7 @@ def first(loc: str = './data/24.csv') -> int:
     return res
 
 
-def second(loc: str = './data/24.csv') -> int:
+def second(loc: str = './data/24.txt') -> int:
     pars = read_parameters(loc)
 
     result = solver(pars, 0, True)

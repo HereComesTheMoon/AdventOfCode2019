@@ -95,7 +95,7 @@ class Packet:
         return op([x.compute() for x in self.content])
 
 
-def read(loc: str = './data/16.csv') -> str:
+def read(loc: str = './data/16.txt') -> str:
     def hex_to_bin(c: str):
         assert len(c) == 1
         res = bin((int(c, 16)))[2:]

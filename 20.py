@@ -47,7 +47,7 @@ def count_lit_pixels(img: list[str]) -> int:
     return sum(row.count("#") for row in img)
 
 
-def first(loc: str = "./data/20.csv") -> int:
+def first(loc: str = "./data/20.txt") -> int:
     alg, img = read(loc)
     img = iterate_enhance(alg, img, 2)
     counter = count_lit_pixels(img)
@@ -55,7 +55,7 @@ def first(loc: str = "./data/20.csv") -> int:
     return counter
 
 
-def second(loc: str = "./data/20.csv") -> int:
+def second(loc: str = "./data/20.txt") -> int:
     alg, img = read(loc)
     img = iterate_enhance(alg, img, 50)
     counter = count_lit_pixels(img)
@@ -65,7 +65,7 @@ def second(loc: str = "./data/20.csv") -> int:
 
 
 if __name__ == '__main__':
-    first("./data/20test.csv")
-    second("./data/20test.csv")
+    first("./data/20test.txt")
+    second("./data/20test.txt")
     first()
     second()

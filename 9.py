@@ -68,7 +68,7 @@ def findBasin(data: np.ndarray, i: int, j: int) -> set[tuple[int, int]]:
 
 
 
-def first(loc: str = './data/9.csv') -> int:
+def first(loc: str = './data/9.txt') -> int:
     data = read(loc)
     results = lowPoints(data)
     # print(len(results), lowPoints)
@@ -77,7 +77,7 @@ def first(loc: str = './data/9.csv') -> int:
     return res
 
 
-def second(loc: str = './data/9.csv') -> int:
+def second(loc: str = './data/9.txt') -> int:
     data = read(loc)
     lPts = lowPoints(data)
     basins = []
